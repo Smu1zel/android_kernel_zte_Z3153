@@ -12,9 +12,6 @@
 #
 
 obj-y += layering_rule_base.o
-
-MTK_PLATFORM := $(subst ",,$(CONFIG_MTK_PLATFORM))
-
 ccflags-y += \
                                 -I$(srctree)/drivers/misc/mediatek/video/include     \
                                 -I$(srctree)/drivers/misc/mediatek/video/common/IPv1     \

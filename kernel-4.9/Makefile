@@ -588,6 +588,9 @@ ifeq ($(dot-config),1)
 # Read in config
 -include include/config/auto.conf
 
+MTK_PLATFORM := $(subst ",,$(CONFIG_MTK_PLATFORM))
+export MTK_PLATFORM
+
 ifeq ($(KBUILD_EXTMOD),)
 # Read in dependencies to all Kconfig* files, make sure to run
 # oldconfig if changes are detected.

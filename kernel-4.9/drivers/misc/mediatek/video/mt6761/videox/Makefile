@@ -36,9 +36,6 @@ obj-$(CONFIG_MTK_FB) += mtkfb_console.o		\
 			mtk_ovl.o		\
 			layering_rule.o \
 			frame_queue.o
-
-MTK_PLATFORM := $(subst ",,$(CONFIG_MTK_PLATFORM))
-
 ccflags-y += -I$(srctree)/drivers/misc/mediatek/video/include/     \
              -I$(srctree)/drivers/misc/mediatek/video/common/   \
              -I$(srctree)/drivers/misc/mediatek/video/common/rdma20/ \
