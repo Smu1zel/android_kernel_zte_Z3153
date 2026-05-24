@@ -16,6 +16,7 @@ ccflags-y += -I$(srctree)/drivers/misc/mediatek/leds/mt6765
 else
 ccflags-y += -I$(srctree)/drivers/misc/mediatek/leds/$(MTK_PLATFORM)
 endif
+ccflags-y += -I$(srctree)/drivers/misc/mediatek/leds
 
 ccflags-y += -I$(srctree)/drivers/misc/mediatek/video/include
 
