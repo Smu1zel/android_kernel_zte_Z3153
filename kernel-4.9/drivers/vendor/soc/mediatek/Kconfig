@@ -1,0 +1,18 @@
+#
+# Kconfig for the mediatek kernel device drivers.
+#
+
+#Goodix
+source "drivers/vendor/soc/mediatek/fingerprint/goodix/Kconfig"
+
+#Silead
+source "drivers/vendor/soc/mediatek/fingerprint/silead/Kconfig"
+
+#Cdfinger
+source "drivers/vendor/soc/mediatek/fingerprint/cdfinger/Kconfig"
+
+source "drivers/vendor/soc/mediatek/fingerprint/egis/Kconfig"
+
+#fortsense
+source "drivers/vendor/soc/mediatek/fingerprint/fortsense/Kconfig"
+
