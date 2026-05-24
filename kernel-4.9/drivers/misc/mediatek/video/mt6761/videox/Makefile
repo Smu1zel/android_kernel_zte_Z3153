@@ -37,9 +37,7 @@ obj-$(CONFIG_MTK_FB) += mtkfb_console.o		\
 			layering_rule.o \
 			frame_queue.o
 
-#ifneq ($(CONFIG_MTK_FB), y) # already in video/common/
-#obj-y += mtkfb_dummy.o
-#endif
+MTK_PLATFORM := $(subst ",,$(CONFIG_MTK_PLATFORM))
 
 ccflags-y += -I$(srctree)/drivers/misc/mediatek/video/include/     \
              -I$(srctree)/drivers/misc/mediatek/video/common/   \
