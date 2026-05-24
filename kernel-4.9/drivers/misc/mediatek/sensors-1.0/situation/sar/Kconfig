@@ -1,0 +1,12 @@
+config CUSTOM_KERNEL_SAR_SENSOR
+	bool "CUSTOM KERNEL SAR SENSOR for MediaTek package"
+	default n
+	help
+	  A sar is a device,
+	  usually portable and electronic
+	  or electromechanical,
+	  that detect distance between the body and device .
+
+source "drivers/misc/mediatek/sensors-1.0/situation/sar/sx932x/Kconfig"
+source "drivers/misc/mediatek/sensors-1.0/situation/sar/sx932x_2/Kconfig"
+source "drivers/misc/mediatek/sensors-1.0/situation/sar/sarhub/Kconfig"

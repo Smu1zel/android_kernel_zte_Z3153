@@ -1,0 +1,9 @@
+config CUSTOM_SX932X_2
+	bool "CUSTOM 2nd KERNEL SAR sx932x Config"
+	default n
+	help
+	  A sar is a device,
+	  usually portable and electronic
+	  or electromechanical,
+	  that detect distance between the body and device .
+
