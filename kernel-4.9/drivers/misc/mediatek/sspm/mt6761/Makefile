@@ -8,6 +8,8 @@ ccflags-y += -I$(srctree)/drivers/misc/mediatek/include/mt-plat/$(CONFIG_MTK_PLA
 ccflags-y += -I$(srctree)/drivers/misc/mediatek/base/power/include/
 ccflags-y += -I$(srctree)/drivers/misc/mediatek/emi/submodule
 ccflags-y += -I$(srctree)/drivers/misc/mediatek/emi/$(CONFIG_MTK_PLATFORM)
+ccflags-y += -I$(srctree)/drivers/misc/mediatek/sspm
+ccflags-y += -I$(srctree)/drivers/misc/mediatek/sspm/$(CONFIG_MTK_PLATFORM)
 ccflags-$(CONFIG_MTK_ENG_BUILD) += -DDEBUG
 
 #SSPM_IPI_TEST=y
