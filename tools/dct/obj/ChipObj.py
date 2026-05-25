@@ -168,23 +168,21 @@ class ChipObj:
 
 
     def gen_spec(self, paras):
-        # if cmp(paras[0], 'cust_dtsi') == 0:
+        # if paras[0] == 'cust_dtsi':
             # self.gen_custDtsi()
             # return True
 
         for para in paras:
-            if cmp(para, 'cust_dtsi') == 0:
+            if para == 'cust_dtsi':
                 self.gen_custDtsi()
                 continue
 
-            idx = 0
             name = ''
             if para.strip() != '':
-                for value in para_map.values():
+                for key, value in para_map.items():
                     if para in value:
-                        name = para_map.keys()[idx]
+                        name = key
                         break
-                    idx += 1
 
             if name != '':
                 log(LogLevel.info, 'Start to generate %s file...' %(para))
@@ -211,7 +209,7 @@ class ChipObj:
         #sorted_list = sorted(self.__objs.keys())
         #for tag in sorted_list:
         for tag in self.__objs.keys():
-            if cmp(tag, 'gpio') == 0:
+            if tag == 'gpio':
                 gpioObj = self.create_obj(tag)
                 gen_str += ModuleObj.writeHeader(gpioObj.get_dtsiFileName())
                 gen_str += gpioObj.fill_mapping_dtsiFile()

@@ -15,10 +15,9 @@
 import sys,os
 import re
 import string
-import ConfigParser
+import configparser as ConfigParser
 import xml.dom.minidom
 
-import ChipObj
 from data.PowerData import PowerData
 from utility.util import log
 from utility.util import LogLevel
@@ -31,7 +30,7 @@ class PowerObj(ModuleObj):
         self.__list = {}
 
     def getCfgInfo(self):
-        cp = ConfigParser.ConfigParser(allow_no_value=True)
+        cp = ConfigParser.ConfigParser(allow_no_value=True, strict=False)
         cp.read(ModuleObj.get_figPath())
 
         self.__list = cp.options('POWER')
@@ -75,7 +74,7 @@ class PowerObj(ModuleObj):
             value = ModuleObj.get_data(self)[key]
             if value.get_varName() == '':
                 continue
-            idx = string.atoi(key[5:])
+            idx = int(key[5:])
             name = self.__list[idx]
             gen_str += '''#define GPIO_%s\t\tGPIO_%s\n''' %(name.upper(), value.get_varName())
 
