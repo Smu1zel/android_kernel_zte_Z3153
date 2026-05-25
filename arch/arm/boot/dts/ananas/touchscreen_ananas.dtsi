@@ -1,0 +1,35 @@
+&i2c0 {
+	status = "okay";
+
+	focaltech@38 {
+		compatible = "focaltech,fts";
+		reg = <0x38>;
+		focaltech,reset-gpio = <&pio 174 0x00>;
+		focaltech,irq-gpio = <&pio 0 0x2002>;
+		vdd-supply = <&mt_pmic_vldo28_ldo_reg>;
+		focaltech,display-coords = <0 0 719 1439>;
+		focaltech,max-touch-number = <2>;
+	};
+
+	tlsc6x_ts@2e {
+		compatible = "tlsc6x,tlsc6x_ts";
+		reg = <0x2e>;
+		gpios = <&pio 174 0
+			&pio 0 0>;
+		vdd_name = "vdd28";
+		vdd28-supply = <&mt_pmic_vldo28_ldo_reg>;
+		TP_MAX_X = <719>;
+		TP_MAX_Y = <1439>;
+	};
+
+	hynitron_ts@15 {
+		compatible = "hynitron,hynitron_ts";
+		reg = <0x15>;
+		gpios = <&pio 174 0
+			&pio 0 0>;
+		vdd_name    = "vdd28";
+		vdd28-supply = <&mt_pmic_vldo28_ldo_reg>;
+		TP_MAX_X = <719>;
+		TP_MAX_Y = <1439>;
+	};
+};

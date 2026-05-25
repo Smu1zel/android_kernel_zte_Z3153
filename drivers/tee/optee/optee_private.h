@@ -20,6 +20,7 @@
 #include <linux/tee_drv.h>
 #include <linux/types.h>
 #include "optee_msg.h"
+#include <linux/semaphore.h>
 
 #define OPTEE_MAX_ARG_SIZE	1024
 
@@ -97,6 +98,7 @@ struct optee {
 	struct tee_shm_pool *pool;
 	void *memremaped_shm;
 	u32 sec_caps;
+	void __iomem *regs;
 };
 
 struct optee_session {

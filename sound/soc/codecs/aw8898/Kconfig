@@ -1,0 +1,5 @@
+config ZTE_AW8898_SMART_PA
+	tristate "SoC Audio for awinic aw8898 series"
+	depends on I2C
+	help
+	  This option enables support for aw8898 series Smart PA.

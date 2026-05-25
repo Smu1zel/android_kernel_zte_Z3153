@@ -26,6 +26,7 @@
 #include <linux/tee_drv.h>
 #include <linux/types.h>
 #include <linux/uaccess.h>
+#include <linux/irqreturn.h>
 #include "optee_private.h"
 #include "optee_smc.h"
 #include "shm_pool.h"
@@ -528,6 +529,44 @@ static optee_invoke_fn *get_invoke_func(struct device_node *np)
 	return ERR_PTR(-EINVAL);
 }
 
+struct semaphore	irq_sem;
+#define SPI_STATUS0_REG                   (0x001c)
+/*#include <mach/sync_write.h> */
+#define spi_readl(reg, offset) __raw_readl(reg+(offset))
+extern void __iomem *get_spi_regs(void);
+static irqreturn_t __attribute__((__unused__)) mt_spi_interrupt(int irq, void *dev_id)
+{
+	struct optee *optee = platform_get_drvdata((struct platform_device *)dev_id);
+	u32 reg_val;
+
+	/*pr_info("\n llllllllllllll mt_spi_interrupt cpu:%d\n", smp_processor_id());*/
+
+	/* liuliang */
+	/*
+	if (!optee) {
+		pr_info("llllllllllllll mt_spi_interrupt dev data is NULL\n");
+		return IRQ_NONE;
+	}
+
+	if (optee->regs == NULL) {
+		optee->regs = get_spi_regs();
+		if (optee->regs == NULL) {
+			pr_info("llllllllllllll mt_spi_interrupt memory is NULL\n");
+			return IRQ_NONE;
+		}
+		platform_set_drvdata((struct platform_device *)dev_id, optee);
+	}
+	*/
+
+	reg_val = spi_readl(optee->regs, SPI_STATUS0_REG);
+	/*pr_info("llllllllllllllll interrupt status:%x\n", reg_val & 0x3);*/
+
+	up(&irq_sem);
+
+	/*pr_info("\n llllllllllllllllll mt_spi_interrupt return cpu:%d end\n", smp_processor_id());*/
+	return IRQ_HANDLED;
+}
+
 static struct optee *optee_probe(struct device_node *np)
 {
 	optee_invoke_fn *invoke_fn;
@@ -608,7 +647,7 @@ static struct optee *optee_probe(struct device_node *np)
 
 	optee_enable_shm_cache(optee);
 
-	pr_info("initialized driver\n");
+	pr_info("initialized driver(optee probe end)\n");
 	return optee;
 err:
 	if (optee) {

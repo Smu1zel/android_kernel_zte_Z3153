@@ -1,0 +1,80 @@
+/*
+ * when you want to delete some nodes or property, modify this dtsi.
+ * some diff between mtk and zte pluto.
+ */
+
+#include "../bat_setting/battery_protect_policy_080500100337.dtsi"
+
+/{
+	mt6357_charger {
+		compatible = "mediatek,mt6357_charger";
+		status="okay";
+		charger_name = "primary_chg";
+		ichg = <1000000>;	/* uA */
+		cv = <4350000>;		/* uV */
+		vcdt_hv_thres = <7000000>;
+		vbat_ov_thres = <4350000>;		/* uV */
+	};
+	/*add for Z3351S flash chip node*/
+	flashlights_aw3648: flashlights_aw3648 {
+		compatible = "mediatek,flashlights_aw3648";
+	};
+
+	ext_speaker_amp_info {
+		status="okay";
+		compatible = "zte,ext-speaker-amp-info";
+		zte,ext-spk-amp-mode = <6>;
+	};
+};
+
+&lk_charger {
+	/delete-property/ enable_pe_plus;
+};
+
+&charger {
+	/delete-property/ enable_pe_plus;
+	/delete-property/ enable_pe_2;
+	/delete-property/ enable_pe_3;
+	/delete-property/ enable_pe_4;
+	/delete-property/ enable_type_c;
+	/delete-property/ power_path_support;
+};
+
+/ {
+	/delete-node/ mt6370_pmu_dts;
+};
+
+/ {
+	/delete-node/ type_c_port0;
+};
+
+&i2c3 {
+	/delete-node/ rt9465@4b;
+};
+
+&charger_policy_service {
+	policy,expired-max-capacity = <70>;
+	policy,expired-min-capacity = <30>;
+	policy,demo-max-capacity = <35>;
+	policy,demo-min-capacity = <30>;
+	policy,no-powerpath-delta-capacity = <0>;
+};
+
+&charge_arbitrate_service {
+	cas,normal-topoff = <8>;
+	/* age, fcv, fcc, rech_soc_1st, rech_soc_2st rech_vol_1st, rech_vol_2st **/
+	cas,age-data = <100 4350000 800000 0 0 100 200
+			95 4320000 800000 0 0 150 250
+			90 4300000 800000 0 0 200 300
+			85 4280000 700000 0 0 250 350
+			80 4260000 600000 0 0 300 400
+			75 4240000 600000 0 0 350 450>;
+};
+
+/* chosen */
+&chosen {
+	bootargs = "console=tty0 console=ttyS0,921600n1 \
+vmalloc=300M slub_max_order=0 slub_debug=OFZPU \
+page_owner=on androidboot.hardware=mt6761 \
+maxcpus=8 firmware_class.path=/vendor/firmware loop.max_part=7";
+};

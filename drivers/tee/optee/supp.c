@@ -131,7 +131,7 @@ u32 optee_supp_thrd_req(struct tee_context *ctx, u32 func, size_t num_params,
 			 * interrupting then wouldn't make sense.
 			 */
 			interruptable = !req->busy;
-			if (!req->busy)
+			if (!req->busy && req->ret != TEEC_ERROR_COMMUNICATION)
 				list_del(&req->link);
 		}
 		mutex_unlock(&supp->mutex);

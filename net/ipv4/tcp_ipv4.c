@@ -74,16 +74,18 @@
 #include <net/xfrm.h>
 #include <net/secure_seq.h>
 #include <net/busy_poll.h>
+#include <net/net_log.h>
 
 #include <linux/inet.h>
 #include <linux/ipv6.h>
 #include <linux/stddef.h>
 #include <linux/proc_fs.h>
 #include <linux/seq_file.h>
+#include <linux/inetdevice.h>
 
 #include <crypto/hash.h>
 #include <linux/scatterlist.h>
-
+extern int tcp_socket_debugfs;
 int sysctl_tcp_tw_reuse __read_mostly;
 int sysctl_tcp_low_latency __read_mostly;
 
@@ -1543,7 +1545,7 @@ bool tcp_prequeue(struct sock *sk, struct sk_buff *skb)
 
 		tp->ucopy.memory = 0;
 	} else if (skb_queue_len(&tp->ucopy.prequeue) == 1) {
-		wake_up_interruptible_sync_poll(sk_sleep(sk),
+		wake_up_interruptible_poll(sk_sleep(sk),
 					   POLLIN | POLLRDNORM | POLLRDBAND);
 		if (!inet_csk_ack_scheduled(sk))
 			inet_csk_reset_xmit_timer(sk, ICSK_TIME_DACK,
@@ -1609,6 +1611,7 @@ int tcp_v4_rcv(struct sk_buff *skb)
 	bool refcounted;
 	struct sock *sk;
 	int ret;
+	kuid_t  uid;
 
 	if (skb->pkt_type != PACKET_HOST)
 		goto discard_it;
@@ -1735,6 +1738,24 @@ process:
 	if (!sock_owned_by_user(sk)) {
 		if (!tcp_prequeue(sk, skb))
 			ret = tcp_v4_do_rcv(sk, skb);
+/*ZTE_LC_TCP_DEBUG, 20170417 improved begin*/
+		if ((ret == 0) && (tcp_socket_debugfs & TCP_IP_LOG_ENABLE)) {
+			if (iph->saddr != htonl(INADDR_LOOPBACK)) {
+				uid = sk ? sk->sk_uid : GLOBAL_ROOT_UID;
+
+				if (!uid_valid(uid))
+					uid = GLOBAL_ROOT_UID;
+
+				pr_log_info("[IPv4] TCP RCV len=%d,uid=%d,"
+					"Gpid:%d (%s), (%pI4:%hu <- %pI4:%hu)\n",
+					ntohs(iph->tot_len),
+					uid.val,
+					current->group_leader->pid, current->group_leader->comm,
+					&iph->daddr, ntohs(th->dest),
+					&iph->saddr, ntohs(th->source));
+			}
+		}
+/*ZTE_LC_TCP_DEBUG, 20170417 improved end*/
 	} else if (tcp_add_backlog(sk, skb)) {
 		goto discard_and_relse;
 	}

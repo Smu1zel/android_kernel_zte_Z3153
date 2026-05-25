@@ -100,9 +100,11 @@ static void wq_wakeup(struct optee_wait_queue *wq, u32 key)
 		complete(&w->c);
 }
 
+extern struct semaphore	irq_sem;
 static void handle_rpc_func_cmd_wq(struct optee *optee,
 				   struct optee_msg_arg *arg)
 {
+	int ret = 0;
 	if (arg->num_params != 1)
 		goto bad;
 
@@ -116,6 +118,21 @@ static void handle_rpc_func_cmd_wq(struct optee *optee,
 		break;
 	case OPTEE_MSG_RPC_WAIT_QUEUE_WAKEUP:
 		wq_wakeup(&optee->wait_queue, arg->params[0].u.value.b);
+		break;
+	/* liuliang */
+	case OPTEE_MSG_RPC_CLEAR_WAIT_QUEUE_IRQ: {
+		/* clear spi irq semphone */
+		/*pr_info("\nchenlu handle_rpc_func_cmd_wq OPTEE_MSG_RPC_CLEAR_WAIT_QUEUE_IRQ sleep\n");*/
+		while (ret == 0) {
+			ret = down_trylock(&irq_sem);
+		}
+		/*pr_info("\nchenlu handle_rpc_func_cmd_wq OPTEE_MSG_RPC_CLEAR_WAIT_QUEUE_IRQ wake\n");*/
+	}
+		break;
+	case OPTEE_MSG_RPC_WAIT_QUEUE_IRQ:
+		/*pr_info("\nchenlu handle_rpc_func_cmd_wq OPTEE_MSG_RPC_WAIT_QUEUE_IRQ sleep\n");*/
+		down(&irq_sem);
+		/*pr_info("\nchenlu handle_rpc_func_cmd_wq OPTEE_MSG_RPC_WAIT_QUEUE_IRQ wake\n");*/
 		break;
 	default:
 		goto bad;
@@ -441,6 +458,18 @@ void optee_handle_rpc(struct tee_context *ctx, struct optee_rpc_param *param,
 	case OPTEE_SMC_RPC_FUNC_CMD:
 		shm = reg_pair_to_ptr(param->a1, param->a2);
 		handle_rpc_func_cmd(ctx, optee, shm, call_ctx);
+		break;
+
+	/*guyoupeng*/
+	case OPTEE_SMC_RPC_FUNC_FIQ:
+		/*
+		 * An FIQ was raised while secure world was executing,
+		 * since all FIQs a handled in Linux a dummy RPC is
+		 * performed to let Linux take the FIQ through the normal
+		 * vector.
+		 */
+
+		/*pr_info("chenlu OPTEE_SMC_RPC_FUNC_FIQ\n");*/
 		break;
 	default:
 		pr_warn("Unknown RPC func 0x%x\n",

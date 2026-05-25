@@ -69,6 +69,7 @@
 #include <net/inet_common.h>
 #include <net/dsfield.h>
 #include <net/l3mdev.h>
+#include <net/net_log.h>
 
 #include <asm/uaccess.h>
 
@@ -409,6 +410,7 @@ static void icmp6_send(struct sk_buff *skb, u8 type, u8 code, __u32 info,
 	int len;
 	int err = 0;
 	u32 mark = IP6_REPLY_MARK(net, skb->mark);
+	kuid_t uid = GLOBAL_ROOT_UID;
 
 	if ((u8 *)hdr < skb->head ||
 	    (skb_network_header(skb) + sizeof(*hdr)) > skb_tail_pointer(skb))
@@ -535,6 +537,16 @@ static void icmp6_send(struct sk_buff *skb, u8 type, u8 code, __u32 info,
 	rcu_read_lock();
 	idev = __in6_dev_get(skb->dev);
 
+	if (tcp_socket_debugfs & TCP_IPV6_LOG_ENABLE) {
+		if (sk)
+			uid = sk ? sk->sk_uid : GLOBAL_ROOT_UID;
+		if (!uid_valid(uid))
+			uid = GLOBAL_ROOT_UID;
+
+		pr_log_info("[IPv6]ICMPV6 SEND uid=%d, Gpid:%d (%s), %pI6 -> %pI6, T = %d, C = %d\n",
+			uid.val, current->group_leader->pid, current->group_leader->comm,
+			&hdr->saddr, &hdr->daddr, type, code);
+	}
 	err = ip6_append_data(sk, icmpv6_getfrag, &msg,
 			      len + sizeof(struct icmp6hdr),
 			      sizeof(struct icmp6hdr),
@@ -767,6 +779,8 @@ static int icmpv6_rcv(struct sk_buff *skb)
 	struct icmp6hdr *hdr;
 	u8 type;
 	bool success = false;
+	struct sock *sk = skb->sk;
+	kuid_t uid = GLOBAL_ROOT_UID;
 
 	if (!xfrm6_policy_check(NULL, XFRM_POLICY_IN, skb)) {
 		struct sec_path *sp = skb_sec_path(skb);
@@ -882,6 +896,16 @@ static int icmpv6_rcv(struct sk_buff *skb)
 	/* until the v6 path can be better sorted assume failure and
 	 * preserve the status quo behaviour for the rest of the paths to here
 	 */
+	if (tcp_socket_debugfs & TCP_IPV6_LOG_ENABLE) {
+		if (sk)
+			uid = sk ? sk->sk_uid : GLOBAL_ROOT_UID;
+		if (!uid_valid(uid))
+			uid = GLOBAL_ROOT_UID;
+
+		pr_log_info("[IPv6]ICMPV6 RCV uid=%d, Gpid:%d (%s), %pI6 <- %pI6, T = %d, C = %d\n",
+			uid.val, current->group_leader->pid, current->group_leader->comm,
+			saddr, daddr, type, hdr->icmp6_code);
+	}
 	if (success)
 		consume_skb(skb);
 	else

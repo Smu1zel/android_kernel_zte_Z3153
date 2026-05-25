@@ -1,0 +1,5 @@
+config MTK_FINGERPRINT_GOODIX
+	tristate "generic goodix fingerprint driver"
+	default n
+	help
+	add support for goodix fingerprint driver.

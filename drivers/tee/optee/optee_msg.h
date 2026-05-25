@@ -262,6 +262,9 @@ struct optee_msg_arg {
 #define OPTEE_MSG_REVISION_MINOR	0
 #define OPTEE_MSG_FUNCID_CALLS_REVISION	0xFF03
 
+/* liuliang */
+#define OPTEE_MSG_FUNCID_CALLS_SPI_CLEAR_IRQ 0xFF05
+
 /*
  * Get UUID of Trusted OS.
  *
@@ -393,6 +396,11 @@ struct optee_msg_arg {
 #define OPTEE_MSG_RPC_CMD_WAIT_QUEUE	4
 #define OPTEE_MSG_RPC_WAIT_QUEUE_SLEEP	0
 #define OPTEE_MSG_RPC_WAIT_QUEUE_WAKEUP	1
+#define OPTEE_MSG_RPC_WAIT_QUEUE_IRQ	2
+
+/* liuliang */
+#define OPTEE_MSG_RPC_CLEAR_WAIT_QUEUE_IRQ    3
+
 
 /*
  * Suspend execution

@@ -115,6 +115,7 @@
 #include "udp_impl.h"
 #include <net/sock_reuseport.h>
 #include <net/addrconf.h>
+#include <net/net_log.h>
 
 struct udp_table udp_table __read_mostly;
 EXPORT_SYMBOL(udp_table);
@@ -131,6 +132,9 @@ EXPORT_SYMBOL(sysctl_udp_wmem_min);
 atomic_long_t udp_memory_allocated;
 EXPORT_SYMBOL(udp_memory_allocated);
 
+/*ZTE_LC_TCP_DEBUG, 20170417 improved  start*/
+extern int tcp_socket_debugfs;
+/*ZTE_LC_TCP_DEBUG,  end*/
 #define MAX_UDP_PORTS 65536
 #define PORTS_PER_CHAIN (MAX_UDP_PORTS / UDP_HTABLE_SIZE_MIN)
 
@@ -1654,6 +1658,14 @@ static int __udp4_lib_mcast_deliver(struct net *net, struct sk_buff *skb,
 	int dif = skb->dev->ifindex;
 	struct hlist_node *node;
 	struct sk_buff *nskb;
+	if (tcp_socket_debugfs & TCP_IP_LOG_ENABLE) {       /* ZTE_LC_TCP_DEBUG , 20170417 improved */
+		pr_log_info("[IP] UDP RCV Multicasts len=%d , "
+			"Gipd:%d (%s) (%pI4:%hu <- %pI4:%hu)\n",
+			ntohs(ip_hdr(skb)->tot_len),
+			current->group_leader->pid, current->group_leader->comm,
+			&daddr, ntohs(uh->dest),
+			&saddr, ntohs(uh->source));
+	}
 
 	if (use_hash2) {
 		hash2_any = udp4_portaddr_hash(net, htonl(INADDR_ANY), hnum) &
@@ -1816,6 +1828,14 @@ int __udp4_lib_rcv(struct sk_buff *skb, struct udp_table *udptable,
 		struct dst_entry *dst = skb_dst(skb);
 		int ret;
 
+		if (tcp_socket_debugfs & TCP_IP_LOG_ENABLE) {       /* ZTE_LC_TCP_DEBUG , 20170417 improved */
+			pr_log_info("[IPv4] UDP RCV len=%d"
+				"Gpid:%d (%s), (%pI4:%hu <- %pI4:%hu)\n",
+				ntohs(ip_hdr(skb)->tot_len),
+				current->group_leader->pid, current->group_leader->comm,
+				&daddr, ntohs(uh->dest),
+				&saddr, ntohs(uh->source));
+		}
 		if (unlikely(sk->sk_rx_dst != dst))
 			udp_sk_rx_dst_set(sk, dst);
 
@@ -1831,6 +1851,14 @@ int __udp4_lib_rcv(struct sk_buff *skb, struct udp_table *udptable,
 	sk = __udp4_lib_lookup_skb(skb, uh->source, uh->dest, udptable);
 	if (sk)
 		return udp_unicast_rcv_skb(sk, skb, uh);
+		if (tcp_socket_debugfs & TCP_IP_LOG_ENABLE) {       /* ZTE_LC_TCP_DEBUG , 20170417 improved */
+				pr_log_info("[IPv4] UDP RCV len=%d "
+				"Gpid:%d (%s), (%pI4:%hu <- %pI4:%hu)\n",
+				ulen,
+				current->group_leader->pid, current->group_leader->comm,
+				&daddr, ntohs(uh->dest),
+				&saddr, ntohs(uh->source));
+		}
 
 	if (!xfrm4_policy_check(NULL, XFRM_POLICY_IN, skb))
 		goto drop;

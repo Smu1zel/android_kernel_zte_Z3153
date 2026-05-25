@@ -13,6 +13,9 @@ selinux-$(CONFIG_SECURITY_NETWORK_XFRM) += xfrm.o
 
 selinux-$(CONFIG_NETLABEL) += netlabel.o
 
+# Preproc/postproc policy as binary image
+selinux-$(CONFIG_SECURITY_SELINUX_POLICYPROC) += ss/policyproc.o
+
 ccflags-y := -I$(srctree)/security/selinux -I$(srctree)/security/selinux/include
 
 $(addprefix $(obj)/,$(selinux-y)): $(obj)/flask.h
@@ -23,3 +26,7 @@ quiet_cmd_flask = GEN     $(obj)/flask.h $(obj)/av_permissions.h
 targets += flask.h av_permissions.h
 $(obj)/flask.h: $(src)/include/classmap.h FORCE
 	$(call if_changed,flask)
+
+ifneq ($(wildcard $(srctree)/../vendor/mediatek/internal/selinux_warning_enable),)
+ccflags-y += -DMTK_SELINUX_WARNING_ENABLE
+endif

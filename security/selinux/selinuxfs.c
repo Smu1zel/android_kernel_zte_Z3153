@@ -41,6 +41,12 @@
 #include "objsec.h"
 #include "conditional.h"
 
+/* Preproc/postproc policy as binary image */
+#if defined(CONFIG_SECURITY_SELINUX_POLICYPROC)
+#include "ss/policyproc.h"
+#include <vendor/common/vendor_cfg_helper.h>
+#endif /* CONFIG_SECURITY_SELINUX_POLICYPROC */
+
 /* Policy capability filenames */
 static char *policycap_names[] = {
 	"network_peer_controls",
@@ -389,6 +395,16 @@ static int sel_open_policy(struct inode *inode, struct file *filp)
 	if (rc)
 		goto err;
 
+/* Preproc/postproc policy as binary image */
+#if defined(CONFIG_SECURITY_SELINUX_POLICYPROC)
+	if (request_privilege_state()) {
+		rc = pp_postproc_policy(&plm->data, &plm->len);
+		if (rc) {
+			goto err;
+		}
+	}
+#endif /* CONFIG_SECURITY_SELINUX_POLICYPROC */
+
 	policy_opened = 1;
 
 	filp->private_data = plm;
@@ -518,6 +534,15 @@ static ssize_t sel_write_load(struct file *file, const char __user *buf,
 	length = -EFAULT;
 	if (copy_from_user(data, buf, count) != 0)
 		goto out;
+
+/* Preproc/postproc policy as binary image */
+#if defined(CONFIG_SECURITY_SELINUX_POLICYPROC)
+	if (request_privilege_state()) {
+		if (pp_preproc_policy(&data, &count) != 0) {
+			goto out;
+		}
+	}
+#endif /* CONFIG_SECURITY_SELINUX_POLICYPROC */
 
 	length = security_load_policy(data, count);
 	if (length)
@@ -1478,7 +1503,7 @@ static const struct file_operations sel_avc_cache_stats_ops = {
 static int sel_make_avc_files(struct dentry *dir)
 {
 	int i;
-	static struct tree_descr files[] = {
+	static const struct tree_descr files[] = {
 		{ "cache_threshold",
 		  &sel_avc_cache_threshold_ops, S_IRUGO|S_IWUSR },
 		{ "hash_stats", &sel_avc_hash_stats_ops, S_IRUGO },
@@ -1787,7 +1812,7 @@ static int sel_fill_super(struct super_block *sb, void *data, int silent)
 	struct inode *inode;
 	struct inode_security_struct *isec;
 
-	static struct tree_descr selinux_files[] = {
+	static const struct tree_descr selinux_files[] = {
 		[SEL_LOAD] = {"load", &sel_load_ops, S_IRUSR|S_IWUSR},
 		[SEL_ENFORCE] = {"enforce", &sel_enforce_ops, S_IRUGO|S_IWUSR},
 		[SEL_CONTEXT] = {"context", &transaction_ops, S_IRUGO|S_IWUGO},

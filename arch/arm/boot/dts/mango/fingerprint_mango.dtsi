@@ -1,0 +1,107 @@
+
+&pio {
+	fingerprint_irq: fingerprint_irq {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO4__FUNC_GPIO4>;
+			slew-rate = <0>;
+			bias-disable;
+		};
+	};
+
+	fingerprint_power_high: state_power_high {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO166__FUNC_GPIO166>;
+			slew-rate = <1>;
+			output-high;
+		};
+	};
+
+	fingerprint_power_low: state_power_low {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO166__FUNC_GPIO166>;
+			slew-rate = <1>;
+			output-low;
+		};
+	};
+
+	fingerprint_reset_high: state_reset_high {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO165__FUNC_GPIO165>;
+			slew-rate = <1>;
+			output-high;
+		};
+	};
+
+	fingerprint_reset_low: state_reset_low {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO165__FUNC_GPIO165>;
+			slew-rate = <1>;
+			output-low;
+		};
+	};
+};
+
+
+&spi1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+	goodix_fp@0 {
+		compatible = "goodix,fingerprint";
+		reg = <0>;
+		spi-max-frequency = <8000000>;
+
+		interrupt-parent = <&pio>;
+		interrupts = <4 IRQ_TYPE_EDGE_RISING 4 0>;
+
+		pinctrl-names = "fingerprint_irq", "power_high", "power_low", "reset_high", "reset_low";
+		pinctrl-0 = <&fingerprint_irq>;
+		pinctrl-1 = <&fingerprint_power_high>;
+		pinctrl-2 = <&fingerprint_power_low>;
+		pinctrl-3 = <&fingerprint_reset_high>;
+		pinctrl-4 = <&fingerprint_reset_low>;
+
+		fp-gpio-reset = <&pio 165 0x00>;
+		fp-gpio-irq = <&pio 4 0x00>;
+		fp-gpio-pwr = <&pio 166 0x00>;
+	};
+
+	cdfinger@1 {
+		compatible = "cdfinger,fps998e";
+		reg = <1>;
+		spi-max-frequency = <8000000>;
+
+		interrupt-parent = <&pio>;
+		interrupts = <4 IRQ_TYPE_EDGE_RISING 4 0>;
+
+		pinctrl-names = "irq-init", "avdd-enable", "power_low", "rst-high", "rst-low";
+		pinctrl-0 = <&fingerprint_irq>;
+		pinctrl-1 = <&fingerprint_power_high>;
+		pinctrl-2 = <&fingerprint_power_low>;
+		pinctrl-3 = <&fingerprint_reset_high>;
+		pinctrl-4 = <&fingerprint_reset_low>;
+
+		rst-gpios = <&pio 165 0x00>;
+		irq-gpios = <&pio 4 0x00>;
+		avdd-gpios = <&pio 166 0x00>;
+	};
+	egistec_spi@2 {
+		compatible = "egis,egistec_spi";
+		reg = <2>;
+		spi-max-frequency = <8000000>;
+		status = "okay";
+	};
+};
+
+&egistec_fp {
+	interrupt-parent = <&pio>;
+	interrupts = <4 IRQ_TYPE_LEVEL_LOW 4 0>;
+
+	pinctrl-names = "irq-init", "power_high", "power_low", "reset_high", "reset_low";
+	pinctrl-0 = <&fingerprint_irq>;
+	pinctrl-1 = <&fingerprint_power_high>;
+	pinctrl-2 = <&fingerprint_power_low>;
+	pinctrl-3 = <&fingerprint_reset_high>;
+	pinctrl-4 = <&fingerprint_reset_low>;
+	status = "okay";
+};

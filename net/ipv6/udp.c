@@ -49,7 +49,7 @@
 #include <net/inet6_hashtables.h>
 #include <net/busy_poll.h>
 #include <net/sock_reuseport.h>
-
+#include <net/net_log.h>
 #include <linux/proc_fs.h>
 #include <linux/seq_file.h>
 #include <trace/events/skb.h>
@@ -820,6 +820,17 @@ int __udp6_lib_rcv(struct sk_buff *skb, struct udp_table *udptable,
 			udp6_csum_zero_error(skb);
 			goto csum_error;
 		}
+        /*ZTE_LC_TCP_DEBUG, 20170418 improved begin*/
+		if (tcp_socket_debugfs & TCP_IPV6_LOG_ENABLE) {    
+			if (!ip_hdr(skb))
+				pr_log_info("[IPv6] UDP RCV len=%d, "
+					"Gpid:%d (%s), (%pI6 :%hu <- %pI6 :%hu)\n",
+					ulen,
+					current->group_leader->pid, current->group_leader->comm,
+					&ip_hdr(skb)->daddr, ntohs(uh->dest),
+					&ip_hdr(skb)->saddr, ntohs(uh->source));
+		}
+        /*ZTE_LC_TCP_DEBUG, 20170418 improved*/
 
 		if (inet_get_convert_csum(sk) && uh->check && !IS_UDPLITE(sk))
 			skb_checksum_try_convert(skb, IPPROTO_UDP, uh->check,

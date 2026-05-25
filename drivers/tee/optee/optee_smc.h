@@ -72,6 +72,13 @@
 			   ARM_SMCCC_OWNER_TRUSTED_OS_END, \
 			   OPTEE_SMC_FUNCID_CALLS_UID)
 
+/* liuliang */
+#define OPTEE_SMC_FUNCID_CALLS_SPI_CLEAR_IRQ	OPTEE_MSG_FUNCID_CALLS_SPI_CLEAR_IRQ
+#define OPTEE_SMC_CALLS_SPI_CLEAR_IRQ \
+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL, ARM_SMCCC_SMC_32, \
+			ARM_SMCCC_OWNER_TRUSTED_OS_END, \
+			OPTEE_SMC_FUNCID_CALLS_SPI_CLEAR_IRQ)
+
 /*
  * Function specified by SMC Calling convention
  *
@@ -432,6 +439,22 @@ struct optee_smc_disable_shm_cache_result {
 #define OPTEE_SMC_RPC_FUNC_CMD		5
 #define OPTEE_SMC_RETURN_RPC_CMD \
 	OPTEE_SMC_RPC_VAL(OPTEE_SMC_RPC_FUNC_CMD)
+
+/* guyoupeng */
+/*
+ * Deliver an IRQ in normal world.
+ *
+ * "Call" register usage:
+ * a0	OPTEE_SMC_RETURN_RPC_FIQ
+ * a1-7	Resume information, must be preserved
+ *
+ * "Return" register usage:
+ * a0	SMC Function ID, OPTEE_SMC_CALL_RETURN_FROM_RPC.
+ * a1-7	Preserved
+ */
+#define OPTEE_SMC_RPC_FUNC_FIQ		6
+#define OPTEE_SMC_RETURN_RPC_FIQ \
+	OPTEE_SMC_RPC_VAL(OPTEE_SMC_RPC_FUNC_FIQ)
 
 /* Returned in a0 */
 #define OPTEE_SMC_RETURN_UNKNOWN_FUNCTION 0xFFFFFFFF

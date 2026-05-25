@@ -16,6 +16,7 @@
 #include <linux/ipv6.h>
 #include <linux/hardirq.h>
 #include <linux/jhash.h>
+#include <linux/refcount.h>
 #include <net/if_inet6.h>
 #include <net/ndisc.h>
 #include <net/flow.h>
@@ -996,4 +997,12 @@ int ipv6_sock_mc_join(struct sock *sk, int ifindex,
 		      const struct in6_addr *addr);
 int ipv6_sock_mc_drop(struct sock *sk, int ifindex,
 		      const struct in6_addr *addr);
+
+/*ZTE_LC_TCP_DEBUG, 20170418 improved*/
+#define TCP_IPV6_LOG_ENABLE		0x00000002
+void xt_socket_get6_print(struct sk_buff *skb, int direction);
+extern int tcp_socket_debugfs;
+/*end ZTE_LC_TCP_DEBUG, 20170418 improved*/
+extern int tcp_socket_debugfs;
+
 #endif /* _NET_IPV6_H */

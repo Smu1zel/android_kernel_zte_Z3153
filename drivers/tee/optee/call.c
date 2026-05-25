@@ -365,7 +365,7 @@ int optee_cancel_req(struct tee_context *ctx, u32 cancel_id, u32 session)
 {
 	struct optee_context_data *ctxdata = ctx->data;
 	struct tee_shm *shm;
-	struct optee_msg_arg *msg_arg;
+	struct optee_msg_arg *msg_arg = NULL;
 	phys_addr_t msg_parg;
 	struct optee_session *sess;
 
@@ -412,6 +412,27 @@ void optee_enable_shm_cache(struct optee *optee)
 	optee_cq_wait_final(&optee->call_queue, &w);
 }
 
+/* liuliang */
+void optee_spi_clear_irq(struct optee *optee)
+{
+	struct optee_call_waiter w;
+
+	/* We need to retry until secure world isn't busy. */
+	optee_cq_wait_init(&optee->call_queue, &w);
+	while (true) {
+		struct arm_smccc_res res;
+		/*wake_lock(&optee_os_wk_lock);*/
+		/*pr_info("wake_lock(&optee_os_wk_lock);");*/
+		optee->invoke_fn(OPTEE_SMC_ENABLE_SHM_CACHE, 0, 0, 0, 0, 0, 0,
+				 0, &res);
+		/*wake_unlock(&optee_os_wk_lock);*/
+		/*pr_info("wake_unlock(&optee_os_wk_lock);");*/
+		if (res.a0 == OPTEE_SMC_RETURN_OK)
+			break;
+		optee_cq_wait_for_completion(&optee->call_queue, &w);
+	}
+	optee_cq_wait_final(&optee->call_queue, &w);
+}
 /**
  * optee_disable_shm_cache() - Disables caching of some shared memory allocation
  *			      in OP-TEE
@@ -625,7 +646,7 @@ out:
 int optee_shm_unregister(struct tee_context *ctx, struct tee_shm *shm)
 {
 	struct tee_shm *shm_arg;
-	struct optee_msg_arg *msg_arg;
+	struct optee_msg_arg *msg_arg = NULL;
 	phys_addr_t msg_parg;
 	int rc = 0;
 

@@ -1,0 +1,100 @@
+/*
+ * when you want to delete some nodes or property, modify this dtsi.
+ * some diff between mtk and zte walnut.
+ */
+
+#include "../bat_setting/battery_protect_policy_080509200107.dtsi"
+
+/{
+
+	ext_speaker_amp_info {
+		status="okay";
+		compatible = "zte,ext-speaker-amp-info";
+		zte,ext-spk-amp-mode = <1>;
+	};
+
+	flashlights_aw3648: flashlights_aw3648 {
+		compatible = "mediatek,flashlights_aw3648";
+	};
+	/*fingerprint nav*/
+	zte_fp_nav: zte_fp_nav {
+		status = "okay";
+		compatible = "zte_fp_nav";
+	};
+};
+&flashlights_mt6370 {
+	status="okay";
+	decouple = <1>;
+	channel@1 {
+		type = <0>;
+		ct = <0>;
+		part = <0>;
+	};
+	/delete-node/ channel@2;
+};
+
+&lk_charger {
+	/delete-property/ enable_anime;
+	/delete-property/ enable_pe_plus;
+};
+
+&charger {
+	/delete-property/ enable_pe_2;
+	/delete-property/ enable_pe_3;
+	/delete-property/ enable_pe_4;
+	/delete-property/ ta_12v_support;
+	/delete-property/ enable_dynamic_mivr;
+};
+
+&mt6370_pmu {
+	mt6370,intr_gpio_num = <11>; /* direct defined GPIO num */
+	mt6370,intr_gpio = <&pio 11 0x0>;
+
+	rgbled {
+		compatible = "mediatek,mt6370_pmu_rgbled";
+		interrupt-names = "isink4_short", "isink3_short",
+				  "isink2_short", "isink1_short",
+				  "isink4_open", "isink3_open",
+				  "isink2_open", "isink1_open";
+		/* name cnt must be 4 */
+		mt,led_name = "mt6370_pmu_led1", "green",
+			      "mt6370_pmu_led3", "red";
+		/* trigger cnt must be 4, mode can be selected as */
+		/* cc_mode -> const current mode */
+		/* pwm_mode -> pwm dimming mode */
+		/* breath_mode -> as the name */
+		mt,led_default_trigger = "none", "cc_mode",
+					 "none", "cc_mode";
+	};
+
+	bled {
+		mt,pwm_hys_en = <1>;	/* PWM Input Hysteresis */
+		mt,pwm_hys = <1>;	/* 0: 1 bit */
+							/* 1: 2 bit */
+							/* 2: 4 bit */
+							/* 3: 6 bit */
+		mt,max_bled_brightness = <656>; /* we have 11 bit resolution, quantize in driver */
+						/* maximum 2047 */
+	};
+	dsv {
+		interrupt-names = "dsv_vneg_ocp",
+				  "dsv_bst_ocp", "dsv_vneg_scp",
+				  "dsv_vpos_scp";
+		db_vbst  = <6200>; /* mV */
+
+		/* 1 = Discharge VNEG when turn off */
+		/* 0 = disable */
+		db_vneg_disc = <1>;
+
+		/* 1 = Discharge VPOS when turn off */
+		/* 0 = disable */
+		db_vpos_disc = <1>;
+	};
+};
+
+
+
+&i2c3 {
+	/delete-node/ rt9465@4b;
+};
+

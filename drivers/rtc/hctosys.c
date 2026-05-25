@@ -24,6 +24,9 @@
  * the best guess is to add 0.5s.
  */
 
+#ifdef ZTE_MTK_ATF_LOG_TIME_FORMAT
+extern void zte_atf_time_sync(void);
+#endif
 static int __init rtc_hctosys(void)
 {
 	int err = -ENODEV;
@@ -65,6 +68,10 @@ static int __init rtc_hctosys(void)
 		tm.tm_hour, tm.tm_min, tm.tm_sec,
 		(long long) tv64.tv_sec);
 
+	/*zte add for sync rtc time to atf log TAG*/
+	#ifdef ZTE_MTK_ATF_LOG_TIME_FORMAT
+	zte_atf_time_sync();
+	#endif
 err_read:
 	rtc_class_close(rtc);
 

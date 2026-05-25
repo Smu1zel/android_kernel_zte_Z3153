@@ -1,0 +1,10 @@
+#
+# CDFINGER Fingerprint driver configuration
+#
+
+config MTK_FINGERPRINT_CDFINGER
+	bool "FPS Fingerprint"
+	default n
+	---help---
+	Egis Fingerprint chip FPS980S TEE driver
+

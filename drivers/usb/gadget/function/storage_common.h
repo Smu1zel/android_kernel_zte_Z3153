@@ -84,6 +84,11 @@ do {									\
 #define SS_WRITE_ERROR				0x030c02
 #define SS_WRITE_PROTECTED			0x072700
 
+#if defined(CONFIG_USB_MAC)
+/* OEM for SCSI Command sent by OS X */
+#define SC_GET_CONFIGRATION      0x46
+#define SC_SET_CD_SPEED          0xbb
+#endif
 #define SK(x)		((u8) ((x) >> 16))	/* Sense Key byte, etc. */
 #define ASC(x)		((u8) ((x) >> 8))
 #define ASCQ(x)		((u8) (x))
@@ -93,6 +98,10 @@ do {									\
  * byte
  */
 #define INQUIRY_STRING_LEN ((size_t) (8 + 16 + 4 + 1))
+
+/* SUA, for cdrom function switch by scsi command */
+#define SC_USB_FUNCTION_SWITCH   0x86
+/* end */
 
 struct fsg_lun {
 	struct file	*filp;
@@ -113,7 +122,8 @@ struct fsg_lun {
 	u32		unit_attention_data;
 
 	unsigned int	blkbits; /* Bits of logical block size
-						       of bound block device */
+				  *of bound block device
+				  */
 	unsigned int	blksize; /* logical block size of bound block device */
 	struct device	dev;
 	const char	*name;		/* "lun.name" */
@@ -131,6 +141,8 @@ static inline bool fsg_lun_is_open(struct fsg_lun *curlun)
 
 /* Maximal number of LUNs supported in mass storage function */
 #define FSG_MAX_LUNS	16
+#define LUN_NAME_LEN	8
+
 
 enum fsg_buffer_state {
 	BUF_STATE_EMPTY = 0,
@@ -231,5 +243,7 @@ ssize_t fsg_store_removable(struct fsg_lun *curlun, const char *buf,
 			    size_t count);
 ssize_t fsg_store_inquiry_string(struct fsg_lun *curlun, const char *buf,
 				 size_t count);
-
+#ifdef ZTE_MAC_STORAGE
+int fsg_get_toc(struct fsg_lun *curlun, int msf, int format, u8 *buf);
+#endif
 #endif /* USB_STORAGE_COMMON_H */
