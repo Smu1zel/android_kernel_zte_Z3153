@@ -17,7 +17,7 @@ if [ -z "$CROSS_COMPILE" ]; then
     export CROSS_COMPILE=arm-linux-androideabi-
 fi
 
-KERNEL_DIR="kernel-4.9"
+KERNEL_DIR="."
 
 echo "=== Changing directory to $KERNEL_DIR ==="
 cd "$KERNEL_DIR"
