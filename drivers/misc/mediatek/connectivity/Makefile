@@ -30,11 +30,17 @@ endif
     subdir-ccflags-y += -I$(srctree)/drivers/clk/mediatek/
     subdir-ccflags-y += -I$(srctree)/drivers/pinctrl/mediatek/
 
-    # Do Nothing, move to standalone repo
+    # MediaTek Connectivity Drivers
     MODULE_NAME := connadp
     obj-y += $(MODULE_NAME).o
     $(MODULE_NAME)-objs += common/connectivity_build_in_adapter.o
     $(MODULE_NAME)-objs += common/wmt_build_in_adapter.o
+
+    obj-$(CONFIG_MTK_COMBO) += common/
+    obj-$(CONFIG_MTK_COMBO_BT) += bt/
+    obj-$(CONFIG_MTK_COMBO_GPS) += gps/
+    obj-$(CONFIG_MTK_FMRADIO) += fmradio/
+    obj-$(CONFIG_MTK_COMBO_WIFI) += wlan/
 
 
     # Do build-in for Makefile checking

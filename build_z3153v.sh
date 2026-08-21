@@ -32,12 +32,13 @@ fi
 echo "Applying Z3153V configuration..."
 make z3153v_defconfig
 
-# 2. Compile kernel and device tree blobs
-echo "Starting kernel build with $(nproc) jobs..."
-make -j$(nproc)
+# 2. Compile kernel, device tree blobs, and modules
+echo "Starting kernel and modules build with $(nproc) jobs..."
+make -j$(nproc) zImage-dtb modules
 
 echo "=== Build Complete ==="
 echo "Output files:"
 echo "- Kernel image with appended DTB: arch/arm/boot/zImage-dtb"
 echo "- Device Tree Blob (DTB):       arch/arm/boot/dts/alps/mt6761.dtb"
 echo "- Device Tree Overlay (DTBO):   arch/arm/boot/dts/alps/k61v1_32_bsp_hdp.dtbo"
+echo "- Kernel Modules:               find . -name '*.ko'"
