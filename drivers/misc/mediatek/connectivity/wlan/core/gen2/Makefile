@@ -150,8 +150,12 @@ ccflags-y += -I$(srctree)/drivers/misc/mediatek/emi/$(MTK_PLATFORM)
 ccflags-y += -I$(srctree)/drivers/misc/mediatek/connectivity/common
 ccflags-y += -I$(srctree)/drivers/misc/mediatek/include/mt-plat
 ccflags-y += -I$(srctree)/drivers/misc/mediatek/include/mt-plat/$(MTK_PLATFORM)/include/mach/
-ccflags-y += -I$(TOP)/vendor/mediatek/kernel_modules/connectivity/common/common_main/include
-ccflags-y += -I$(TOP)/vendor/mediatek/kernel_modules/connectivity/common/common_main/linux/include
+WMT_SRC_FOLDER ?= $(srctree)/drivers/misc/mediatek/connectivity/common
+ifeq (,$(wildcard $(WMT_SRC_FOLDER)))
+    WMT_SRC_FOLDER := $(TOP)/vendor/mediatek/kernel_modules/connectivity/common
+endif
+ccflags-y += -I$(WMT_SRC_FOLDER)/common_main/include
+ccflags-y += -I$(WMT_SRC_FOLDER)/common_main/linux/include
 ccflags-y += -DMTK_WCN_WMT_STP_EXP_SYMBOL_ABSTRACT
 
 MODULE_NAME := wlan_drv_gen2

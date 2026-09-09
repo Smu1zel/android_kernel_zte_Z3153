@@ -15,7 +15,7 @@
 # Necessary Check
 
 ifeq ($(AUTOCONF_H),)
-    $(error AUTOCONF_H is not defined)
+    AUTOCONF_H := $(if $(wildcard $(objtree)/include/generated/autoconf.h),$(objtree)/include/generated/autoconf.h,$(srctree)/include/generated/autoconf.h)
 endif
 
 ccflags-y += -imacros $(AUTOCONF_H)
@@ -110,14 +110,20 @@ endif
                     chips/$(FM_CHIP_PATH)_fm_rds.o
 
 ifeq ($(CFG_BUILD_CONNAC2), true)
-    CONNINFRA_SRC_FOLDER := $(TOP)/vendor/mediatek/kernel_modules/connectivity/conninfra
+    CONNINFRA_SRC_FOLDER ?= $(srctree)/drivers/misc/mediatek/connectivity/conninfra
+    ifeq (,$(wildcard $(CONNINFRA_SRC_FOLDER)))
+        CONNINFRA_SRC_FOLDER := $(TOP)/vendor/mediatek/kernel_modules/connectivity/conninfra
+    endif
 
     ccflags-y += -I$(CONNINFRA_SRC_FOLDER)/include
     ccflags-y += -DCFG_FM_CONNAC2=1
     $(FM_CHIP)-objs += chips/$(FM_CHIP_PATH)_2_fm_lib.o
     $(FM_CHIP)-objs += plat/conn_infra.o
 else
-    WMT_SRC_FOLDER := $(TOP)/vendor/mediatek/kernel_modules/connectivity/common
+    WMT_SRC_FOLDER ?= $(srctree)/drivers/misc/mediatek/connectivity/common
+    ifeq (,$(wildcard $(WMT_SRC_FOLDER)))
+        WMT_SRC_FOLDER := $(TOP)/vendor/mediatek/kernel_modules/connectivity/common
+    endif
     WMT_INCLUDE_PATH := common_main
 
     ccflags-y += -I$(WMT_SRC_FOLDER)/$(WMT_INCLUDE_PATH)/include \

@@ -1,7 +1,12 @@
 # ---------------------------------------------------
 # ALPS Setting
 # ---------------------------------------------------
-ifneq ($(KERNEL_OUT),)
+ifeq ($(AUTOCONF_H),)
+    AUTOCONF_H := $(if $(wildcard $(objtree)/include/generated/autoconf.h),$(objtree)/include/generated/autoconf.h,$(srctree)/include/generated/autoconf.h)
+endif
+ifneq ($(wildcard $(AUTOCONF_H)),)
+    ccflags-y += -imacros $(AUTOCONF_H)
+else ifneq ($(KERNEL_OUT),)
     ccflags-y += -imacros $(KERNEL_OUT)/include/generated/autoconf.h
 endif
 
@@ -20,6 +25,24 @@ WLAN_CHIP_LIST:=-UMT6620 -UMT6628 -UMT5931 -UMT6630 -UMT6632 -UMT7663 -UCONNAC -
 # '-D' and '-U' options are processed in the order they are given on the command line.
 # All '-imacros file' and '-include file' options are processed after all '-D' and '-U' options.
 ccflags-y += $(WLAN_CHIP_LIST)
+
+# Platform defaults for in-tree kernel build
+ifeq ($(CONFIG_MTK_COMBO_CHIP_CONSYS_6761),y)
+    CONFIG_MTK_COMBO_WIFI_HIF ?= axi
+    MTK_COMBO_CHIP ?= CONNAC
+    WLAN_CHIP_ID ?= 6761
+    MTK_ANDROID_WMT ?= y
+else ifeq ($(CONFIG_MTK_COMBO_CHIP_CONSYS_6765),y)
+    CONFIG_MTK_COMBO_WIFI_HIF ?= axi
+    MTK_COMBO_CHIP ?= CONNAC
+    WLAN_CHIP_ID ?= 6765
+    MTK_ANDROID_WMT ?= y
+else ifeq ($(CONFIG_MTK_COMBO_CHIP_CONSYS_6779),y)
+    CONFIG_MTK_COMBO_WIFI_HIF ?= axi
+    MTK_COMBO_CHIP ?= CONNAC
+    WLAN_CHIP_ID ?= 6779
+    MTK_ANDROID_WMT ?= y
+endif
 
 ifeq ($(MTK_COMBO_CHIP),)
 MTK_COMBO_CHIP = MT6632
@@ -201,7 +224,7 @@ else
 endif
 
 ifeq ($(MODULE_NAME),)
-	MODULE_NAME := wlan_$(shell echo $(strip $(WLAN_CHIP_ID)) | tr A-Z a-z)_$(CONFIG_MTK_COMBO_WIFI_HIF)
+	MODULE_NAME := wlan_drv_gen4m
 endif
 
 ccflags-y += -DDBG=0

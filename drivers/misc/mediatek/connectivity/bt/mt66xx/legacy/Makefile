@@ -5,7 +5,7 @@
 # Necessary Check
 
 ifeq ($(AUTOCONF_H),)
-    $(error AUTOCONF_H is not defined)
+    AUTOCONF_H := $(if $(wildcard $(objtree)/include/generated/autoconf.h),$(objtree)/include/generated/autoconf.h,$(srctree)/include/generated/autoconf.h)
 endif
 
 ccflags-y += -imacros $(AUTOCONF_H)
@@ -29,7 +29,10 @@ endif
 ###############################################################################
 # To include BT driver dependent header file
 
-WMT_SRC_FOLDER := $(TOP)/vendor/mediatek/kernel_modules/connectivity/common
+WMT_SRC_FOLDER ?= $(srctree)/drivers/misc/mediatek/connectivity/common
+ifeq (,$(wildcard $(WMT_SRC_FOLDER)))
+    WMT_SRC_FOLDER := $(TOP)/vendor/mediatek/kernel_modules/connectivity/common
+endif
 ccflags-y += -I$(WMT_SRC_FOLDER)/common_main/include
 ccflags-y += -I$(WMT_SRC_FOLDER)/common_main/linux/include
 ifneq ($(CONFIG_MTK_CONNSYS_DEDICATED_LOG_PATH),)

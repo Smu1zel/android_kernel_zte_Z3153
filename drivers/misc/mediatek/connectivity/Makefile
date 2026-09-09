@@ -15,6 +15,11 @@
 # If KERNELRELEASE is defined, we've been invoked from the
 # kernel build system and can use its language.
 ifneq ($(KERNELRELEASE),)
+    ifeq ($(AUTOCONF_H),)
+        AUTOCONF_H := $(if $(wildcard $(objtree)/include/generated/autoconf.h),$(objtree)/include/generated/autoconf.h,$(srctree)/include/generated/autoconf.h)
+        export AUTOCONF_H
+    endif
+
     subdir-ccflags-y += -I$(srctree)/
     subdir-ccflags-y += -I$(srctree)/drivers/misc/mediatek/base/power/include
     subdir-ccflags-y += -I$(srctree)/drivers/misc/mediatek/base/power/include/clkbuf_v1

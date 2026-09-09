@@ -5,7 +5,7 @@
 # Necessary Check
 
 ifeq ($(AUTOCONF_H),)
-    $(error AUTOCONF_H is not defined)
+    AUTOCONF_H := $(if $(wildcard $(objtree)/include/generated/autoconf.h),$(objtree)/include/generated/autoconf.h,$(srctree)/include/generated/autoconf.h)
 endif
 
 ccflags-y += -imacros $(AUTOCONF_H) -DCHIP_IF_BTIF
@@ -22,8 +22,15 @@ ccflags-y += -D CREATE_NODE_DYNAMIC=1
 # ---------------------------------------------------
 # Include Path
 # ---------------------------------------------------
-CONN_INFRA_SRC := $(TOP)/vendor/mediatek/kernel_modules/connectivity/conninfra
-WMT_SRC := $(TOP)/vendor/mediatek/kernel_modules/connectivity/common
+CONN_INFRA_SRC ?= $(srctree)/drivers/misc/mediatek/connectivity/conninfra
+ifeq (,$(wildcard $(CONN_INFRA_SRC)))
+    CONN_INFRA_SRC := $(TOP)/vendor/mediatek/kernel_modules/connectivity/conninfra
+endif
+
+WMT_SRC ?= $(srctree)/drivers/misc/mediatek/connectivity/common
+ifeq (,$(wildcard $(WMT_SRC)))
+    WMT_SRC := $(TOP)/vendor/mediatek/kernel_modules/connectivity/common
+endif
 BTIF_SRC := $(srctree)/drivers/misc/mediatek/btif
 ccflags-y += -I$(CONN_INFRA_SRC)/include
 ccflags-y += -I$(CONN_INFRA_SRC)/debug_utility/include

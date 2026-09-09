@@ -2,7 +2,7 @@
 # Necessary Check
 
 ifeq ($(AUTOCONF_H),)
-    $(error AUTOCONF_H is not defined)
+    AUTOCONF_H := $(if $(wildcard $(objtree)/include/generated/autoconf.h),$(objtree)/include/generated/autoconf.h,$(srctree)/include/generated/autoconf.h)
 endif
 
 

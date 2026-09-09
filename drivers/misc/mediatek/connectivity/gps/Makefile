@@ -13,7 +13,7 @@
 # Necessary Check
 
 ifeq ($(AUTOCONF_H),)
-    $(error AUTOCONF_H is not defined)
+    AUTOCONF_H := $(if $(wildcard $(objtree)/include/generated/autoconf.h),$(objtree)/include/generated/autoconf.h,$(srctree)/include/generated/autoconf.h)
 endif
 
 ccflags-y += -imacros $(AUTOCONF_H)
@@ -60,7 +60,10 @@ ccflags-y += -I$(srctree)/drivers/devfreq
 MODULE_NAME := gps_drv
 obj-m += $(MODULE_NAME).o
 
-WMT_SRC_FOLDER := $(TOP)/vendor/mediatek/kernel_modules/connectivity/common
+WMT_SRC_FOLDER ?= $(srctree)/drivers/misc/mediatek/connectivity/common
+ifeq (,$(wildcard $(WMT_SRC_FOLDER)))
+    WMT_SRC_FOLDER := $(TOP)/vendor/mediatek/kernel_modules/connectivity/common
+endif
 
 ifeq ($(CONFIG_MTK_COMBO_CHIP),)
     $(error CONFIG_MTK_COMBO_CHIP not defined)
