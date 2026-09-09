@@ -2690,41 +2690,42 @@ int mtk_cfg80211_testmode_hs20_cmd(IN struct wiphy *wiphy,
 
 	if (data && len) {
 		prParams = (struct wpa_driver_hs20_data_s *)data;
-	if (prParams) {
-		int i;
+		if (prParams) {
+			int i;
 
-		DBGLOG(INIT, INFO, "Cmd Type (%d)\n", prParams->CmdType);
-		switch (prParams->CmdType) {
-		case HS20_CMD_ID_SET_BSSID_POOL:
-			DBGLOG(REQ, TRACE,
-			"fgBssidPoolIsEnable=%d, ucNumBssidPool=%d\n",
-			prParams->hs20_set_bssid_pool.fgBssidPoolIsEnable,
-			prParams->hs20_set_bssid_pool.ucNumBssidPool);
-			for (i = 0;
-			     i < prParams->hs20_set_bssid_pool.ucNumBssidPool;
-			     i++) {
+			DBGLOG(INIT, INFO, "Cmd Type (%d)\n", prParams->CmdType);
+			switch (prParams->CmdType) {
+			case HS20_CMD_ID_SET_BSSID_POOL:
 				DBGLOG(REQ, TRACE,
-					"[%d][ " MACSTR " ]\n",
-					i,
-					MAC2STR(prParams->
-					hs20_set_bssid_pool.
-					arBssidPool[i]));
+				"fgBssidPoolIsEnable=%d, ucNumBssidPool=%d\n",
+				prParams->hs20_set_bssid_pool.fgBssidPoolIsEnable,
+				prParams->hs20_set_bssid_pool.ucNumBssidPool);
+				for (i = 0;
+				     i < prParams->hs20_set_bssid_pool.ucNumBssidPool;
+				     i++) {
+					DBGLOG(REQ, TRACE,
+						"[%d][ " MACSTR " ]\n",
+						i,
+						MAC2STR(prParams->
+						hs20_set_bssid_pool.
+						arBssidPool[i]));
+				}
+				rstatus = kalIoctlByBssIdx(prGlueInfo,
+				   (PFN_OID_HANDLER_FUNC) wlanoidSetHS20BssidPool,
+				   &prParams->hs20_set_bssid_pool,
+				   sizeof(struct param_hs20_set_bssid_pool),
+				   FALSE, FALSE, TRUE, &u4SetInfoLen,
+				   ucBssIndex);
+				break;
+			default:
+				DBGLOG(REQ, TRACE,
+					"Unknown Cmd Type (%d)\n",
+					prParams->CmdType);
+				rstatus = WLAN_STATUS_FAILURE;
+
 			}
-			rstatus = kalIoctlByBssIdx(prGlueInfo,
-			   (PFN_OID_HANDLER_FUNC) wlanoidSetHS20BssidPool,
-			   &prParams->hs20_set_bssid_pool,
-			   sizeof(struct param_hs20_set_bssid_pool),
-			   FALSE, FALSE, TRUE, FALSE, &u4SetInfoLen,
-			   ucBssIndex);
-			break;
-		default:
-			DBGLOG(REQ, TRACE,
-				"Unknown Cmd Type (%d)\n",
-				prParams->CmdType);
-			rstatus = WLAN_STATUS_FAILURE;
 
 		}
-
 	}
 
 	if (rstatus != WLAN_STATUS_SUCCESS)
