@@ -12,6 +12,10 @@
 
 # Ensure linker flags are correct
 LDFLAGS		:=
+# ARM kernel linker scripts (e.g. Spectre-BHB) use OVERLAY, which ld.gold does not support
+ifeq ($(shell $(CROSS_COMPILE)ld.bfd -v >/dev/null 2>&1 && echo y),y)
+LD		:= $(CROSS_COMPILE)ld.bfd
+endif
 
 LDFLAGS_vmlinux	:= --no-undefined -X --pic-veneer
 ifeq ($(CONFIG_CPU_ENDIAN_BE8),y)
