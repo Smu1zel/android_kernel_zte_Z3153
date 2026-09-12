@@ -2102,7 +2102,7 @@ static size_t cont_print_text(char *text, size_t size)
 	size_t textlen = 0;
 	size_t len;
 
-	if (cont.cons == 0 && (console_prev & LOG_NEWLINE)) {
+	if (cont.cons == 0) {
 		/*zte_pm change*/
 #if defined(CONFIG_TIME_FORMAT_ZTELOG)
 		textlen += print_time(cont.ts, text);
