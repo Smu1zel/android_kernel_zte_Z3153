@@ -301,7 +301,7 @@ static struct sched_group_energy energy_core_a15 = {
 
 /* sd energy functions */
 inline
-const struct sched_group_energy * const cpu_cluster_energy(int cpu)
+const struct sched_group_energy *cpu_cluster_energy(int cpu)
 {
 #ifndef CONFIG_MTK_UNIFY_POWER
 	return cpu_topology[cpu].socket_id ? &energy_cluster_a7 :
@@ -332,7 +332,7 @@ const struct sched_group_energy * const cpu_cluster_energy(int cpu)
 }
 
 inline
-const struct sched_group_energy * const cpu_core_energy(int cpu)
+const struct sched_group_energy *cpu_core_energy(int cpu)
 {
 #ifndef CONFIG_MTK_UNIFY_POWER
 	return cpu_topology[cpu].socket_id ? &energy_core_a7 :
