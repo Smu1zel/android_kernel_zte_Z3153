@@ -21,6 +21,7 @@
 #include "rt_ext.c"
 
 int sched_rr_timeslice = RR_TIMESLICE;
+int sysctl_sched_rr_timeslice = (MSEC_PER_SEC / HZ) * RR_TIMESLICE;
 
 static int do_sched_rt_period_timer(struct rt_bandwidth *rt_b, int overrun);
 
@@ -2704,6 +2705,9 @@ const struct sched_class rt_sched_class = {
 	.switched_to		= switched_to_rt,
 
 	.update_curr		= update_curr_rt,
+#ifdef CONFIG_SCHED_WALT
+	.fixup_cumulative_runnable_avg = walt_fixup_cumulative_runnable_avg,
+#endif
 
 #ifdef CONFIG_UCLAMP_TASK
 	.uclamp_enabled		= 1,
