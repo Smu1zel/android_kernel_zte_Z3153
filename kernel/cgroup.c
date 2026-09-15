@@ -2133,7 +2133,6 @@ static struct dentry *cgroup_mount(struct file_system_type *fs_type,
 		cgroup_enable_task_cg_lists();
 
 	if (is_v2) {
-		if (data) {
 			char *opts = data;
 			char *token;
 
